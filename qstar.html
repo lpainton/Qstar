@@ -3,10 +3,18 @@
     <head>
         <title>Quidditch Star</title>
     </head>
-    <body>
+    <body id='main'>
         <canvas id='game-area'></canvas>
         <button id='reverse'>Reverse</button>
         <button id='advance'>Advance</button>
     </body>
     <script src="./qstar.js"></script>
+    <script type="text/javascript">
+        gmap = new GameMap(10, 10)
+        gmap.setCell(2,2,'BL')
+        gmap.setCell(7,7,'SN')
+        loadAssets(gmap).then(
+            () => draw(gmap)
+        )
+    </script>
 </html>
