@@ -8,11 +8,15 @@
         <button id='reverse'>Reverse</button>
         <button id='advance'>Advance</button>
     </body>
-    <script src="./qstar.js"></script>
+    <script src="./graphics.js"></script>
     <script type="text/javascript">
         gmap = new GameMap(10, 10)
         gmap.setCell(2,2,'BL')
         gmap.setCell(7,7,'SN')
+        gmap.setCell(1,1,'P1')
+        gmap.setCell(2,1,'P2')
+        gmap.setCell(3,1,'P3')
+        gmap.setCell(4,1,'P4')
         loadAssets(gmap).then(
             () => draw(gmap)
         )

@@ -1,4 +1,4 @@
-console.log("Script loading...")
+console.log("Main script loading...")
 
 const canvas = document.getElementById('game-area')
 const cellSize = 50
@@ -6,6 +6,7 @@ const gridColor = 'gray'
 const sprites = new Map()
 const snitchPath = "./img/snitch.png"
 const bludgerPath = "./img/bludger.png"
+const seekerPath = "./img/seeker.png"
 
 /**
  * Valid Cell Values
@@ -13,6 +14,13 @@ const bludgerPath = "./img/bludger.png"
  * SN = Snitch
  * BL = Obstacle
  */
+
+let playerColorMap = new Map()
+playerColorMap.set('P0', 'white')
+playerColorMap.set('P1', 'red')
+playerColorMap.set('P2', 'blue')
+playerColorMap.set('P3', 'green')
+playerColorMap.set('P4', 'yellow')
 
 class GameMap {
     constructor(r, c) {
@@ -39,9 +47,12 @@ function calcCanvasSize(gamemap) {
 function loadAssets(gamemap, endpoints) {
     calcCanvasSize(gamemap)
     return loadImage('SN', snitchPath)
-        .then(() => {
-            return loadImage('BL',bludgerPath)
-        })
+        .then(() => loadImage('BL',bludgerPath))
+        .then(() => loadImage('P0',seekerPath))
+        .then(() => loadImage('P1',seekerPath))
+        .then(() => loadImage('P2',seekerPath))
+        .then(() => loadImage('P3',seekerPath))
+        .then(() => loadImage('P4',seekerPath))
 }
 
 function loadImage(name, path) {
@@ -50,7 +61,6 @@ function loadImage(name, path) {
         let image = new Image()
         image.src = path
         image.onload = () => {
-            console.log(image)
             resolve()
         }
         sprites.set(name, image)
@@ -95,6 +105,27 @@ function drawSpriteLayer(gamemap, layer) {
     }
 }
 
+function drawBox(r,c,name,context) {
+    let x = c * cellSize
+    let y = r * cellSize
+    context.fillStyle = playerColorMap.get(name)
+    context.fillRect(x+1, y+1, cellSize-2, cellSize-2)
+}
+
+function drawPlayerTokens(gamemap) {
+    console.log(`drawing tokens`)
+    let context = canvas.getContext('2d')
+    for (let i=0; i<gamemap.cols; i++) {
+        for (let j=0; j<gamemap.rows; j++) {
+            let cell = gamemap.getCell(j,i)
+            if (playerColorMap.has(cell)) {
+                drawBox(j,i,cell,context)
+                drawSprite(j,i,cell,context)
+            }
+        }
+    }
+}
+
 function clearCanvas() {
     let context = canvas.getContext('2d')
     context.clearRect(0,0,canvas.width, canvas.height)
@@ -107,4 +138,5 @@ function draw(gamemap) {
     drawGrid(gamemap)
     drawSpriteLayer(gamemap, 'BL')
     drawSpriteLayer(gamemap, 'SN')
+    drawPlayerTokens(gamemap)
 }
