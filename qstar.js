@@ -8,19 +8,19 @@ const snitchPath = "./img/snitch.png"
 const bludgerPath = "./img/bludger.png"
 const seekerPath = "./img/seeker.png"
 
-/**
- * Valid Cell Values
- * P# = Player #
- * SN = Snitch
- * BL = Obstacle
- */
-
 let playerColorMap = new Map()
 playerColorMap.set('P0', 'white')
 playerColorMap.set('P1', 'red')
 playerColorMap.set('P2', 'blue')
 playerColorMap.set('P3', 'green')
 playerColorMap.set('P4', 'yellow')
+
+/**
+ * Valid Cell Values
+ * P# = Player #
+ * SN = Snitch
+ * BL = Obstacle
+ */
 
 class GameMap {
     constructor(r, c) {
@@ -29,13 +29,11 @@ class GameMap {
         this.cells = []
     }
 
-    setCell(r,c,value) {
-        this.cells[(r*this.cols) + c] = value
-    }
-
-    getCell(r,c) {
-        return this.cells[(r*this.cols) + c]
-    }
+    setCell(r,c,value) {this.cells[(r*this.cols) + c] = value}
+    getCell(r,c) {return this.cells[(r*this.cols) + c]}
+    setPlayer(r,c,num) {this.setCell(r,c,`P${num || 0}`)}
+    setSnitch(r,c) {this.setCell(r,c,'SN')}
+    setBludger(r,c) {this.setCell(r,c,'BL')}
 }
 
 function calcCanvasSize(gamemap) {
@@ -139,4 +137,23 @@ function draw(gamemap) {
     drawSpriteLayer(gamemap, 'BL')
     drawSpriteLayer(gamemap, 'SN')
     drawPlayerTokens(gamemap)
+}
+
+
+/**
+ * MAIN GAME LOGIC
+ */
+function loadGame(event, gamemap, players) {
+    event.stopPropagation()
+    event.preventDefault()
+
+    let links = players.map(elt => document.getElementById(`endpoint-${elt}`).value)
+
+    //Swap displayed
+    document.getElementById('load-div').style.display='none'
+    document.getElementById('game-div').style.display='block'
+
+    loadAssets(gamemap, links).then(() => {
+        draw(gamemap)
+    })
 }

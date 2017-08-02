@@ -4,21 +4,27 @@
         <title>Quidditch Star</title>
     </head>
     <body id='main'>
-        <canvas id='game-area'></canvas>
-        <button id='reverse'>Reverse</button>
-        <button id='advance'>Advance</button>
+        <div id='load-div' onsubmit='loadGame(event, gmap, [0])'>
+            <form id='load-form'>
+                <input id='endpoint-0' type="text" placeholder="Player 0 endpoint" required></input></br>
+                <input type="submit" value="Start"></input>
+            </form>
+        </div>
+        <div id='game-div' style="display:none">
+            <canvas id='game-area'></canvas>
+            <button id='reverse'>Reverse</button>
+            <button id='advance'>Advance</button>
+        </div>
     </body>
-    <script src="./graphics.js"></script>
+    <script src="./qstar.js"></script>
     <script type="text/javascript">
         gmap = new GameMap(10, 10)
-        gmap.setCell(2,2,'BL')
-        gmap.setCell(7,7,'SN')
-        gmap.setCell(1,1,'P1')
-        gmap.setCell(2,1,'P2')
-        gmap.setCell(3,1,'P3')
-        gmap.setCell(4,1,'P4')
-        loadAssets(gmap).then(
-            () => draw(gmap)
-        )
+        gmap.setBludger(2,2)
+        gmap.setSnitch(7,7)
+        gmap.setPlayer(0,0)
+        gmap.setPlayer(0,1,1)
+        gmap.setPlayer(0,2,2)
+        gmap.setPlayer(0,3,3)
+        gmap.setPlayer(0,4,4)
     </script>
 </html>
