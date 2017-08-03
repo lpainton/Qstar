@@ -15,6 +15,9 @@ playerColorMap.set('P2', 'blue')
 playerColorMap.set('P3', 'green')
 playerColorMap.set('P4', 'yellow')
 
+let gameState = undefined
+let playerLinks = new Map()
+
 /**
  * Valid Cell Values
  * P# = Player #
@@ -43,6 +46,16 @@ function calcCanvasSize(gamemap) {
 }
 
 function loadAssets(gamemap, endpoints) {
+    gameState = gamemap
+
+    //Save links
+    playerLinks.set('P0', endpoints[0])
+    if (endpoints.length > 1) {
+        endpoints.forEach((link, i) => {
+            playerLinks.set(`P${i+1}`, link)
+        })
+    }
+
     calcCanvasSize(gamemap)
     return loadImage('SN', snitchPath)
         .then(() => loadImage('BL',bludgerPath))
@@ -139,6 +152,10 @@ function draw(gamemap) {
     drawPlayerTokens(gamemap)
 }
 
+function drawState() {
+    draw(gameState)
+}
+
 
 /**
  * MAIN GAME LOGIC
@@ -154,6 +171,26 @@ function loadGame(event, gamemap, players) {
     document.getElementById('game-div').style.display='block'
 
     loadAssets(gamemap, links).then(() => {
-        draw(gamemap)
+        drawState()
     })
+}
+
+function advanceState() {
+    //For each player
+        //Make ajax call to AI for action
+        //Resolve actions
+    
+    //Draw new game state
+}
+
+/**
+ * Valid actions 
+ * N, S, E, W or some binary composition thereof
+ * e.g. NE, EN, WS
+ * 
+ * @param {Number} playerNum 
+ * @param {String} action 
+ */
+function resolveAction(playerNum, action) {
+    
 }
