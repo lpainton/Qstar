@@ -18,6 +18,11 @@ playerColorMap.set('P4', 'yellow')
 let gameState = undefined
 let playerLinks = new Map()
 
+var moves = 0
+var flightTime = 0
+
+var autoAdvance = null;
+
 /**
  * Valid Cell Values
  * P# = Player #
@@ -37,6 +42,14 @@ class GameMap {
     setPlayer(r,c,num) {this.setCell(r,c,`P${num || 0}`)}
     setSnitch(r,c) {this.setCell(r,c,'SN')}
     setBludger(r,c) {this.setCell(r,c,'BL')}
+    getPlayerPos(num) {
+        let player = `P${num}`
+        let index = this.cells.indexOf(player)
+        return [
+            Math.floor(index/this.cols),
+            (index%this.cols)
+        ]
+    }
 }
 
 function calcCanvasSize(gamemap) {
@@ -45,25 +58,16 @@ function calcCanvasSize(gamemap) {
     console.log(`Setting canvas size to ${canvas.width}px x ${canvas.height}px`)
 }
 
-function loadAssets(gamemap, endpoints) {
+function loadAssets(gamemap, endpoint) {
     gameState = gamemap
 
     //Save links
-    playerLinks.set('P0', endpoints[0])
-    if (endpoints.length > 1) {
-        endpoints.forEach((link, i) => {
-            playerLinks.set(`P${i+1}`, link)
-        })
-    }
+    playerLinks.set('P0', endpoint)
 
     calcCanvasSize(gamemap)
     return loadImage('SN', snitchPath)
         .then(() => loadImage('BL',bludgerPath))
         .then(() => loadImage('P0',seekerPath))
-        .then(() => loadImage('P1',seekerPath))
-        .then(() => loadImage('P2',seekerPath))
-        .then(() => loadImage('P3',seekerPath))
-        .then(() => loadImage('P4',seekerPath))
 }
 
 function loadImage(name, path) {
@@ -88,7 +92,7 @@ function drawGrid(gamemap) {
     let context = canvas.getContext('2d')
     context.beginPath()
     context.strokeStyle = gridColor
-    console.log('Drawing the grid!')
+    //console.log('Drawing the grid!')
     for (let i=0; i<gamemap.cols; i++) {
         for (let j=0; j<gamemap.rows; j++) {
             drawCellBorder(j,i, context)
@@ -105,7 +109,7 @@ function drawSprite(r,c,name,context) {
 }
 
 function drawSpriteLayer(gamemap, layer) {
-    console.log(`drawing layer ${layer}`)
+    // console.log(`drawing layer ${layer}`)
     let context = canvas.getContext('2d')
     for (let i=0; i<gamemap.cols; i++) {
         for (let j=0; j<gamemap.rows; j++) {
@@ -124,7 +128,7 @@ function drawBox(r,c,name,context) {
 }
 
 function drawPlayerTokens(gamemap) {
-    console.log(`drawing tokens`)
+    // console.log(`drawing tokens`)
     let context = canvas.getContext('2d')
     for (let i=0; i<gamemap.cols; i++) {
         for (let j=0; j<gamemap.rows; j++) {
@@ -144,7 +148,7 @@ function clearCanvas() {
 }
 
 function draw(gamemap) {
-    console.log('drawing...')
+    //console.log('drawing...')
     clearCanvas()
     drawGrid(gamemap)
     drawSpriteLayer(gamemap, 'BL')
@@ -176,12 +180,43 @@ function loadGame(event, gamemap, players) {
 }
 
 function advanceState() {
-    //For each player
-        //Make ajax call to AI for action
-        //Resolve actions
-    
-    //Draw new game state
+    let startTime = Date.now()
+    let handler = resp => {
+        let body = JSON.parse(resp.srcElement.response)
+        recordMetrics(startTime)
+        console.log(body)
+        resolveAction(0, body)
+    }
+
+    let req = makeRequest("P0", handler)
+    req.send()
 }
+
+function autoAdvanceState() {
+    if (!autoAdvance)
+        autoAdvance = setInterval(advanceState, 500)
+    else
+        clearInterval(autoAdvance)
+}
+
+function makeRequest(player, rxHandler) {
+    let body = {
+        me: player,
+        state: gameState.cells
+    }
+
+    let req = new XMLHttpRequest();
+    req.addEventListener("load", rxHandler)
+    req.open("POST", playerLinks.get('P0'))
+    return req
+}
+
+//Map of directions to R,C coords
+let vectorMap = new Map()
+vectorMap.set('N', [-1,0])
+vectorMap.set('E', [0,1])
+vectorMap.set('S', [1,0])
+vectorMap.set('W', [0,-1])
 
 /**
  * Valid actions 
@@ -192,5 +227,77 @@ function advanceState() {
  * @param {String} action 
  */
 function resolveAction(playerNum, action) {
-    
+
+    let actionString = action['action']
+    let dirs = [actionString.charAt(0), actionString.charAt(1)]
+
+    let vectors = getVectors(dirs)
+
+    if (vectorsAreOrthagonal(vectors[0], vectors[1])) {
+        let composite = makeCompositeVector(vectors)
+        //console.log(`composite vector ${composite}`)
+        let playerLoc = gameState.getPlayerPos(playerNum)
+        //console.log(`player position at r=${playerLoc[0]} and c=${playerLoc[1]}`)
+        let candidateLoc = [playerLoc[0] + composite[0], playerLoc[1] + composite[1]]
+        //console.log(`candidate position ${candidateLoc}`)
+        let collision = isCollision(candidateLoc)
+        if (collision) { 
+            console.log(`collision at ${candidateLoc}`)
+            return;
+        } else {
+            let goal = isGoal(candidateLoc)
+            if (goal) {
+                let winString = `WINNER in ${moves} moves and ${flightTime} elapsed ms`
+                console.log(winString)
+                alert(winString)
+                clearInterval(autoAdvance)
+            }
+            gameState.setCell(playerLoc[0], playerLoc[1], null)
+            gameState.setCell(candidateLoc[0], candidateLoc[1], `P${playerNum}`)
+            drawState()
+        }
+    } else {
+        console.log(`Invalid action provided: ${actionString}`)
+    }
+}
+
+function isGoal(loc) {
+    return (gameState.getCell(loc[0], loc[1]) === 'SN')
+}
+
+function isCollision(loc) {
+    //Out of bounds
+    if (loc[0] < 0 
+        || loc[0] > gameState.rows - 1
+        || loc[1] < 0
+        || loc[1] > gameState.cols - 1
+    ) {
+        return true
+    } else {
+        //Now check collisions with bludgers
+        return (gameState.getCell(loc[0], loc[1]) === 'BL')
+    }
+}
+
+function makeCompositeVector(vectors) {
+    return [
+        vectors[0][0] + vectors[1][0],
+        vectors[0][1] + vectors[1][1]
+    ]
+}
+
+function getVectors(dirs) {
+    return dirs.map(dir => {
+        return vectorMap.get(dir) || [0,0]
+    })
+}
+
+function vectorsAreOrthagonal(a, b) {
+    return ((a[0] * b[0]) + (a[1] * b[1])) === 0
+}
+
+function recordMetrics(startTime) {
+    moves++
+    flightTime += Date.now() - startTime
+    console.log(`Moves: ${moves}, Time: ${flightTime}`)
 }
