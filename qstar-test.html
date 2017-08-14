@@ -12,16 +12,17 @@
         </div>
         <div id='game-div' style="display:none">
             <canvas id='game-area'></canvas>
+            <hr/>
             <button id='auto' onclick='autoAdvanceState()'>Auto/Stop</button>
             <button id='advance' onclick='advanceState()'>Advance</button>
         </div>
     </body>
     <script src="./qstar-basic.js"></script>
     <script type="text/javascript">
-        gmap = new GameMap(10, 10)
+        gmap = new GameMap(5, 5)
         gmap.setBludger(2,2)
         gmap.setBludger(0,1)
-        gmap.setSnitch(7,7)
+        gmap.setSnitch(4,4)
         gmap.setPlayer(0,0)
     </script>
 </html>

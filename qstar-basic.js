@@ -202,6 +202,8 @@ function autoAdvanceState() {
 function makeRequest(player, rxHandler) {
     let body = {
         me: player,
+        rows: gameState.rows,
+        cols: gameState.cols,
         state: gameState.cells
     }
 
