@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Quidditch Star</title>
+    </head>
+    <body id='main'>
+        <h1>Mind The Gap</h1>
+        <div id='load-div' onsubmit='loadGame(event, gmap, [0])'>
+            <form id='load-form'>
+                <input id='endpoint-0' type="text" placeholder="Player 0 endpoint" required></input></br>
+                <input type="submit" value="Start"></input>
+            </form>
+        </div>
+        <div id='game-div' style="display:none">
+            <canvas id='game-area'></canvas>
+            <hr/>
+            <button id='auto' onclick='autoAdvanceState()'>Auto/Stop</button>
+            <button id='advance' onclick='advanceState()'>Advance</button>
+        </div>
+    </body>
+    <script src="./qstar-basic.js"></script>
+    <script type="text/javascript">
+        let map = [
+            [0, 0, 0, 2, 0, 0, 0, 0, 2, 0],
+            [0, 0, 0, 2, 0, 0, 0, 0, 2, 0],
+            [0, 0, 0, 2, 0, 0, 2, 2, 0, 2],
+            [0, 2, 0, 2, 2, 2, 2, 0, 2, 2],
+            [0, 2, 0, 0, 1, 0, 0, 2, 2, 0],
+            [0, 0, 0, 2, 2, 2, 2, 2, 0, 0],
+            [0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 2, 0, 0, 0, 2, 2, 2],
+            [0, 0, 0, 0, 0, 0, 0, 2, 3, 2],
+            [0, 0, 0, 2, 0, 0, 0, 0, 2, 2],
+        ]
+        gmap = new GameMap(map.length, map[0].length)
+        for(var i = 0; i < map.length; i++) {
+            for(var j = 0; j < map[i].length; j++) {
+                switch(map[i][j]) {
+                    case 1:
+                        gmap.setPlayer(i, j);
+                        break;
+                    case 2:
+                        gmap.setBludger(i, j);
+                        break;
+                    case 3:
+                        gmap.setSnitch(i, j);
+                        break;
+                }
+            }
+        }
+        // gmap.setBludger(2,2)
+        // gmap.setBludger(0,1)
+        // gmap.setSnitch(4,4)
+        // gmap.setPlayer(0,0)
+    </script>
+</html>
