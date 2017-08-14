@@ -4,7 +4,7 @@
         <title>Quidditch Star</title>
     </head>
     <body id='main'>
-        <h1>plants feel paint tho</h1>
+        <h1 id="title">Randomly Generating title <span id="dot"></span></h1>
         <div id='load-div' onsubmit='loadGame(event, gmap, [0])'>
             <form id='load-form'>
                 <input id='endpoint-0' type="text" placeholder="Player 0 endpoint" required></input></br>
@@ -20,6 +20,31 @@
     </body>
     <script src="./qstar-basic.js"></script>
     <script type="text/javascript">
+        let dots = ['', '.', '..', '...'];
+        let number = 0;
+        let killme = setInterval(() => {
+            document.getElementById('dot').innerHTML = dots[number % 4];
+            number +=1;
+            if(number > 12) {
+                var excuse = excuses[Math.floor(Math.random()*excuses.length)];
+                document.getElementById('title').innerHTML = excuse;
+                clearInterval(killme)
+            }
+        }, 300)
+        let excuses = [
+            "protein",
+            "canine teeth",
+            "plants have feelings",
+            "my blood type",
+            "humane farms",
+            "personal choice",
+            "I am a lion",
+            "morality is subjective",
+            "ancestors",
+        ];
+        setTimeout(()=> {
+            
+        }, 5000)
         let map = [
             [2, 0, 0, 0, 0, 2, 0, 2, 2, 2],
             [0, 2, 0, 1, 0, 2, 0, 2, 0, 0],
