@@ -4,6 +4,7 @@
         <title>Quidditch Star</title>
     </head>
     <body id='main'>
+        <h1>Mind The Gap</h1>
         <div id='load-div' onsubmit='loadGame(event, gmap, [0])'>
             <form id='load-form'>
                 <input id='endpoint-0' type="text" placeholder="Player 0 endpoint" required></input></br>
@@ -20,15 +21,15 @@
     <script src="./qstar-basic.js"></script>
     <script type="text/javascript">
         let map = [
-            [0, 0, 0, 2, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 2, 0, 0, 0, 0, 2, 0],
-            [0, 0, 0, 2, 0, 0, 0, 2, 0, 0],
-            [0, 2, 0, 2, 2, 2, 2, 0, 2, 0],
-            [0, 2, 0, 0, 1, 0, 0, 2, 0, 0],
+            [0, 0, 0, 2, 0, 0, 0, 0, 2, 0],
+            [0, 0, 0, 2, 0, 0, 2, 2, 0, 2],
+            [0, 2, 0, 2, 2, 2, 2, 0, 2, 2],
+            [0, 2, 0, 0, 1, 0, 0, 2, 2, 0],
             [0, 0, 0, 2, 2, 2, 2, 2, 0, 0],
             [0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 2, 0, 0, 0, 2, 2, 2],
-            [0, 0, 0, 2, 0, 0, 0, 2, 3, 2],
+            [0, 0, 0, 0, 0, 0, 0, 2, 3, 2],
             [0, 0, 0, 2, 0, 0, 0, 0, 2, 2],
         ]
         gmap = new GameMap(map.length, map[0].length)
