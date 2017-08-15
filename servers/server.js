@@ -9,6 +9,8 @@ app.post('/', processRequest)
 
 function processRequest(req, res) {
     console.log('POST received')
+    // console.log(req)
+    console.log(req.body)
     let state = req.body.state
     let me = req.body.you
     let action = getAction(me, state)

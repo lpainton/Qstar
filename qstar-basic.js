@@ -182,14 +182,14 @@ function loadGame(event, gamemap, players) {
 function advanceState() {
     let startTime = Date.now()
     let handler = resp => {
-        let body = JSON.parse(resp.srcElement.response)
+        console.log(resp)
+        let body = resp
         recordMetrics(startTime)
-        console.log(body)
+        //console.log(body)
         resolveAction(0, body)
     }
 
-    let req = makeRequest("P0", handler)
-    req.send()
+    makeRequest("P0", handler)
 }
 
 function autoAdvanceState() {
@@ -206,11 +206,22 @@ function makeRequest(player, rxHandler) {
         cols: gameState.cols,
         state: gameState.cells
     }
+    //console.log(JSON.stringify(body))
 
-    let req = new XMLHttpRequest();
-    req.addEventListener("load", rxHandler)
-    req.open("POST", playerLinks.get('P0'))
-    return req
+    // let req = new XMLHttpRequest();
+    // req.addEventListener("load", rxHandler) 
+    // req.open("POST", playerLinks.get('P0'))
+    // req.send(JSON.stringify(body))
+
+    fetch(playerLinks.get('P0'), {
+        method: 'post',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    })
+    .then(resp => {return resp.json()})
+    .then(res => {rxHandler(res)})
 }
 
 //Map of directions to R,C coords
